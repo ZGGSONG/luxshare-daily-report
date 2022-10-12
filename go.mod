@@ -4,7 +4,9 @@ go 1.18
 
 require (
 	github.com/fsnotify/fsnotify v1.5.4
+	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/viper v1.13.0
+	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
 
 require (
@@ -18,7 +20,7 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.4.1 // indirect
-	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
+	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

@@ -1,8 +1,8 @@
 package config
 
 import (
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -32,11 +32,13 @@ func InitialConfig() Config {
 }
 
 type Config struct {
-	Port string
+	Port    string
+	Quality string
 }
 
 func getConfig() Config {
 	var config Config
 	config.Port = viper.GetString("server.port")
+	config.Quality = viper.GetString("img.quality")
 	return config
 }

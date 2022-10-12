@@ -2,7 +2,7 @@ package util
 
 import (
 	"github.com/fsnotify/fsnotify"
-	"log"
+	log "github.com/sirupsen/logrus"
 )
 
 //
