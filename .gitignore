@@ -1,0 +1,10 @@
+receive-files
+
+.idea
+
+/log
+/Log
+
+*.log
+
+.out
