@@ -2,6 +2,7 @@ package serve
 
 import (
 	"bytes"
+	"encoding/base64"
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"image"
@@ -10,6 +11,7 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"receive-files/global"
@@ -85,6 +87,16 @@ https://github.com/zggsong`))
 //
 func DeclarationService(files []string) {
 	time.Sleep(3 * time.Second)
+	//登陆获取auth
+
+	//申报
+	for _, file := range files {
+		srcByte, _ := ioutil.ReadFile(file)
+		res := base64.StdEncoding.EncodeToString(srcByte)
+		log.Printf("[DEBUG] Base64 decoding: %s", res)
+	}
+	//刷新门禁
+
 	for _, file := range files {
 		if err := os.Remove(file); err != nil {
 			log.Printf("[ERROR] 删除失败, %v", err)
