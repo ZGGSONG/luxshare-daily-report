@@ -43,6 +43,12 @@ func init() {
 }
 
 func main() {
+	//test
+	//ticket: Q9okHMY42Fk7kzLA3rvPTCbUShhX3zqlbaT97CDjUbxql0NH0AAqKYw+XfSjwoytijuuHXOc7vNY9GePZoIZSg==
+	//ticket := core.Login("13901424", "Jiaobaba123123.")
+	//fmt.Println(ticket)
+	//return
+
 	// 监听目录下文件
 	//go util.ListeningDirectory("upload")
 	global.GLO_RECV_CHAN = make(chan []string)

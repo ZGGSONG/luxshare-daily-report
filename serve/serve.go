@@ -15,6 +15,7 @@ import (
 	"net/http"
 	"os"
 	"receive-files/global"
+	"receive-files/serve/core"
 	"strconv"
 	"time"
 )
@@ -88,6 +89,11 @@ https://github.com/zggsong`))
 func DeclarationService(files []string) {
 	time.Sleep(3 * time.Second)
 	//登陆获取auth
+	ticket := core.Login("13901424", "Jiaobaba123123.")
+	if ticket == "" {
+		log.Printf("[ERROR] Login for ticket fail: %v", ticket)
+		return
+	}
 
 	//申报
 	for _, file := range files {
