@@ -63,3 +63,9 @@ type UniverseResp struct {
 	ErrMsg    string      `json:"ErrMsg"`
 	Data      interface{} `json:"Data"`
 }
+
+type BarkResp struct {
+	Code      int    `json:"code"`
+	Message   string `json:"message"`
+	Timestamp int    `json:"timestamp"`
+}

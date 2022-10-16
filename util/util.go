@@ -1,8 +1,14 @@
 package util
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/fsnotify/fsnotify"
 	log "github.com/sirupsen/logrus"
+	"io/ioutil"
+	"net/http"
+	"receive-files/global"
+	"receive-files/model"
 )
 
 //
@@ -61,4 +67,33 @@ func ListeningDirectory(path string) {
 
 	//循环
 	select {}
+}
+
+//
+// Send
+//  @Description: bark通知
+//  @param msg
+//
+func Send(msg string) {
+	favicon := "https://m.luxshare-ict.com/favicon.ico"
+	if global.GLO_CONFIG.BarkUrl == "" {
+		log.Printf("[ERROR] bark url is empty!!!")
+		return
+	}
+	getUrl := fmt.Sprintf("%s/KSAT MRSB Serve/%s?icon=%s", global.GLO_CONFIG.BarkUrl, msg, favicon)
+	resp, err := http.Get(getUrl)
+	defer resp.Body.Close()
+	if err != nil {
+		log.Printf("[ERROR] Send to bark err: %v", err)
+		return
+	}
+
+	body, _ := ioutil.ReadAll(resp.Body)
+	var barkResp model.BarkResp
+	if err = json.Unmarshal(body, &barkResp); err != nil {
+		log.Printf("[ERROR] bark unmarshal err: %v", err)
+		return
+	}
+	log.Printf("[INFO] Send to bark success")
+
 }

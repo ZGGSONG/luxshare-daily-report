@@ -16,6 +16,7 @@ import (
 	"os"
 	"receive-files/global"
 	"receive-files/serve/core"
+	"receive-files/util"
 	"strconv"
 	"time"
 )
@@ -87,7 +88,7 @@ https://github.com/zggsong`))
 
 //
 // DeclarationService
-//  @Description: 申报服务
+//  @Description: 每日申报服务
 //  @param files
 //
 func DeclarationService(files map[string]string) {
@@ -96,7 +97,9 @@ func DeclarationService(files map[string]string) {
 	//ticket := "Q9okHMY42Fk7kzLA3rvPTCbUShhX3zqlbaT97CDjUbxql0NH0AAqKYw+XfSjwoytijuuHXOc7vNY9GePZoIZSg=="
 	ticket, err := core.Login(global.GLO_CONFIG.UserName, global.GLO_CONFIG.PassWord)
 	if ticket == "" || err != nil {
-		log.Printf(fmt.Sprintf("ticket: %v, err:%v", ticket, err.Error()))
+		errMsg := fmt.Sprintf("ticket: %v, err:%v", ticket, err.Error())
+		log.Printf(errMsg)
+		util.Send(errMsg)
 		return
 	}
 
@@ -113,15 +116,17 @@ func DeclarationService(files map[string]string) {
 	//log.Printf("[DEBUG] images links: %s", imagesLinks)
 	if err != nil {
 		log.Printf(err.Error())
+		util.Send(err.Error())
 		return
 	}
 
 	//申报
 	if err = core.EpidemicRegistration(ticket, imagesLinks); err != nil {
 		log.Printf(err.Error())
+		util.Send(err.Error())
 		return
 	}
-	log.Printf("[INFO] 申报成功")
+	log.Printf("[INFO] 每日申报成功")
 
 	//等待
 	time.Sleep(time.Second * 3)
@@ -129,10 +134,12 @@ func DeclarationService(files map[string]string) {
 	//刷新门禁
 	if err = core.RefreshDoor(ticket); err != nil {
 		log.Printf(err.Error())
+		util.Send(err.Error())
 		return
 	}
 	log.Printf("[INFO] 刷新门禁成功")
 
+	util.Send("[INFO] 每日申报成功")
 }
 
 //
