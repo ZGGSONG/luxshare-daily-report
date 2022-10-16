@@ -94,9 +94,9 @@ func DeclarationService(files map[string]string) {
 	time.Sleep(3 * time.Second)
 	//登陆获取auth
 	//ticket := "Q9okHMY42Fk7kzLA3rvPTCbUShhX3zqlbaT97CDjUbxql0NH0AAqKYw+XfSjwoytijuuHXOc7vNY9GePZoIZSg=="
-	ticket := core.Login(global.GLO_CONFIG.UserName, global.GLO_CONFIG.PassWord)
-	if ticket == "" {
-		log.Printf("[ERROR] Login for ticket fail: %v", ticket)
+	ticket, err := core.Login(global.GLO_CONFIG.UserName, global.GLO_CONFIG.PassWord)
+	if ticket == "" || err != nil {
+		log.Printf(fmt.Sprintf("ticket: %v, err:%v", ticket, err.Error()))
 		return
 	}
 
@@ -108,13 +108,18 @@ func DeclarationService(files map[string]string) {
 	resJkm := base64.StdEncoding.EncodeToString(srcJkm)
 	m["xcm"] = resXcm
 	m["jkm"] = resJkm
-	imagesLinks := core.Upload2Azure(ticket, m)
-	//log.Printf("[DEBUG] images links: %s", imagesLinks)
 	//imagesLinks := []string{"https://p.luxshare-ict.com/KSLANTO/EpidemicSys/20221016/html5_2a05b9ab03844033a63b2c2ac06556ab.jpg", "https://p.luxshare-ict.com/KSLANTO/EpidemicSys/20221016/html5_7e64fd5c643c49299571583163623f7b.jpg"}
+	imagesLinks, err := core.Upload2Azure(ticket, m)
+	//log.Printf("[DEBUG] images links: %s", imagesLinks)
+	if err != nil {
+		log.Printf(err.Error())
+		return
+	}
 
 	//申报
-	if err := core.EpidemicRegistration(ticket, imagesLinks); err != nil {
+	if err = core.EpidemicRegistration(ticket, imagesLinks); err != nil {
 		log.Printf(err.Error())
+		return
 	}
 	log.Printf("[INFO] 申报成功")
 
@@ -122,8 +127,9 @@ func DeclarationService(files map[string]string) {
 	time.Sleep(time.Second * 3)
 
 	//刷新门禁
-	if err := core.RefreshDoor(ticket); err != nil {
+	if err = core.RefreshDoor(ticket); err != nil {
 		log.Printf(err.Error())
+		return
 	}
 	log.Printf("[INFO] 刷新门禁成功")
 

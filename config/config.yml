@@ -1,8 +1,0 @@
-server:
-  port: 7201
-img:
-  quality: 20
-info:
-  username:
-  password:
-  userinfo:
