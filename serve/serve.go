@@ -75,7 +75,11 @@ https://github.com/zggsong`))
 	str, _ := os.Getwd()
 	dic := fmt.Sprintf("%v/upload/", str)
 	if fn == "xcm.jpeg" {
-		global.GLO_RECV_CHAN <- []string{dic + "jkm.jpeg", dic + "xcm.jpeg"}
+		//路径字典
+		m := make(map[string]string, 2)
+		m["xcm"] = dic + "xcm.jpeg"
+		m["jkm"] = dic + "jkm.jpeg"
+		global.GLO_RECV_CHAN <- m
 	}
 
 	w.Write([]byte("Successful...")) //这个写入到w的是输出到客户端的
@@ -86,30 +90,43 @@ https://github.com/zggsong`))
 //  @Description: 申报服务
 //  @param files
 //
-func DeclarationService(files []string) {
+func DeclarationService(files map[string]string) {
 	time.Sleep(3 * time.Second)
 	//登陆获取auth
-	ticket := core.Login("13901424", "Jiaobaba123123.")
+	//ticket := "Q9okHMY42Fk7kzLA3rvPTCbUShhX3zqlbaT97CDjUbxql0NH0AAqKYw+XfSjwoytijuuHXOc7vNY9GePZoIZSg=="
+	ticket := core.Login(global.GLO_CONFIG.UserName, global.GLO_CONFIG.PassWord)
 	if ticket == "" {
 		log.Printf("[ERROR] Login for ticket fail: %v", ticket)
 		return
 	}
 
-	//申报
-	for _, file := range files {
-		srcByte, _ := ioutil.ReadFile(file)
-		res := base64.StdEncoding.EncodeToString(srcByte)
-		log.Printf("[DEBUG] Base64 decoding: %s", res)
-	}
-	//刷新门禁
+	//上传图片
+	var m = make(map[string]string, 2)
+	srcXcm, _ := ioutil.ReadFile(files["xcm"])
+	srcJkm, _ := ioutil.ReadFile(files["jkm"])
+	resXcm := base64.StdEncoding.EncodeToString(srcXcm)
+	resJkm := base64.StdEncoding.EncodeToString(srcJkm)
+	m["xcm"] = resXcm
+	m["jkm"] = resJkm
+	imagesLinks := core.Upload2Azure(ticket, m)
+	//log.Printf("[DEBUG] images links: %s", imagesLinks)
+	//imagesLinks := []string{"https://p.luxshare-ict.com/KSLANTO/EpidemicSys/20221016/html5_2a05b9ab03844033a63b2c2ac06556ab.jpg", "https://p.luxshare-ict.com/KSLANTO/EpidemicSys/20221016/html5_7e64fd5c643c49299571583163623f7b.jpg"}
 
-	for _, file := range files {
-		if err := os.Remove(file); err != nil {
-			log.Printf("[ERROR] 删除失败, %v", err)
-			continue
-		}
-		log.Printf("[INFO] delete file %v", file)
+	//申报
+	if err := core.EpidemicRegistration(ticket, imagesLinks); err != nil {
+		log.Printf(err.Error())
 	}
+	log.Printf("[INFO] 申报成功")
+
+	//等待
+	time.Sleep(time.Second * 3)
+
+	//刷新门禁
+	if err := core.RefreshDoor(ticket); err != nil {
+		log.Printf(err.Error())
+	}
+	log.Printf("[INFO] 刷新门禁成功")
+
 }
 
 //
@@ -147,7 +164,7 @@ func CompressImageResource(imagePath string) {
 	if err != nil {
 		log.Printf("[ERROR] (compressImageResource) Write Compress File failed err: %v", err)
 	} else {
-		log.Printf("[INFO] (compressImageResource) Compress %v success", imagePath)
+		log.Printf("[INFO] Compress %v success", imagePath)
 	}
 }
 

@@ -1,12 +1,15 @@
 package model
 
+// LoginResp
+//  @Description: 登陆返回Model
+//
 type LoginResp struct {
-	IsSuccess bool        `json:"IsSuccess"`
-	ErrMsg    interface{} `json:"ErrMsg"`
-	Data      Data        `json:"Data"`
+	IsSuccess bool          `json:"IsSuccess"`
+	ErrMsg    interface{}   `json:"ErrMsg"`
+	Data      LoginRespData `json:"Data"`
 }
 
-type Data struct {
+type LoginRespData struct {
 	IsLeaveLogin bool     `json:"IsLeaveLogin"`
 	IsOnJob      bool     `json:"IsOnJob"`
 	UserInfo     UserInfo `json:"UserInfo"`
@@ -34,4 +37,29 @@ type UserInfo struct {
 	Name         string `json:"Name"`
 	IdCardNo     string `json:"IdCardNo"`
 	IsOnJob      bool   `json:"IsOnJob"`
+}
+
+//
+// Upload2AzureResp
+//  @Description: 上传图片返回Model
+//
+type Upload2AzureResp struct {
+	IsSuccess bool                 `json:"IsSuccess"`
+	ErrMsg    interface{}          `json:"ErrMsg"`
+	Data      Upload2AzureRespData `json:"Data"`
+}
+type Upload2AzureRespData struct {
+	ImagePaths []string `json:"ImagePaths"`
+	ByCity     string   `json:"ByCity"`
+	IsOk       bool     `json:"IsOk"`
+}
+
+//
+// UniverseResp
+//  @Description: 申报、刷新门禁返回Model
+//
+type UniverseResp struct {
+	IsSuccess bool        `json:"IsSuccess"`
+	ErrMsg    string      `json:"ErrMsg"`
+	Data      interface{} `json:"Data"`
 }

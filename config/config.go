@@ -32,13 +32,19 @@ func InitialConfig() Config {
 }
 
 type Config struct {
-	Port    string
-	Quality string
+	Port     string
+	Quality  string
+	UserName string
+	PassWord string
+	UserInfo string
 }
 
 func getConfig() Config {
 	var config Config
 	config.Port = viper.GetString("server.port")
 	config.Quality = viper.GetString("img.quality")
+	config.UserName = viper.GetString("info.username")
+	config.PassWord = viper.GetString("info.password")
+	config.UserInfo = viper.GetString("info.userinfo")
 	return config
 }
