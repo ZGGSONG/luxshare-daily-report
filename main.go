@@ -15,7 +15,7 @@ func init() {
 	// 初始化日志
 	logger := &lumberjack.Logger{
 		//Filename:   "./Log/Receive_File_Log" + time.Now().Format("20060102_150405") + ".txt",
-		Filename:   "./Log/Receive_File_Log.txt",
+		Filename:   "./log/Receive_File_Log.txt",
 		MaxSize:    10,   // 日志文件大小，单位是 MB
 		MaxBackups: 3,    // 最大过期日志保留个数
 		MaxAge:     28,   // 保留过期文件最大时间，单位 天

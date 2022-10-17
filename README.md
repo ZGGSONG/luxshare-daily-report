@@ -1,5 +1,5 @@
 ## client
 
 ```shell
-curl -X POST -F 'file=@test.xls' 127.0.0.1:8080/upload
+curl -X POST -F 'file=@xcm.jpeg' -F 'name=xcm.jpeg' 127.0.0.1:7201/upload
 ```
