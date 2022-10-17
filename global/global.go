@@ -1,6 +1,6 @@
 package global
 
-import "receive-files/config"
+import "ksat-mrsb/config"
 
 var (
 	GLO_CONFIG    config.Config

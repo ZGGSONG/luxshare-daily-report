@@ -6,9 +6,9 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"ksat-mrsb/model"
 	"net/http"
 	"net/url"
-	"receive-files/model"
 	"strings"
 )
 

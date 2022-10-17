@@ -6,9 +6,9 @@ import (
 	"github.com/fsnotify/fsnotify"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
+	"ksat-mrsb/global"
+	"ksat-mrsb/model"
 	"net/http"
-	"receive-files/global"
-	"receive-files/model"
 )
 
 //

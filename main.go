@@ -3,14 +3,13 @@ package main
 import (
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/natefinch/lumberjack.v2"
+	"ksat-mrsb/config"
+	"ksat-mrsb/global"
+	"ksat-mrsb/serve"
 	"net/http"
 	"os"
-	"receive-files/config"
-	"receive-files/global"
-	"receive-files/serve"
 )
 
-// TODO: 程序退出 关闭日志
 func init() {
 	// 初始化日志
 	logger := &lumberjack.Logger{

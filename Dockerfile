@@ -7,8 +7,8 @@ RUN mkdir "/app/config"
 RUN mkdir "/app/log"
 RUN mkdir "/app/upload"
 
-COPY receive-files "/app/receive-files"
+COPY ksat-mrsb "/app/ksat-mrsb"
 
 EXPOSE 7201
 
-ENTRYPOINT ["./receive-files"]
+ENTRYPOINT ["./ksat-mrsb"]
