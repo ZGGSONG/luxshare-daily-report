@@ -53,8 +53,8 @@ func main() {
 	// 监听每日申报
 	go chanHandler()
 
-	log.Printf("[INFO] Service Listener Port At %v...", global.GLO_CONFIG.Port)
-	err := http.ListenAndServe(":"+global.GLO_CONFIG.Port, mux)
+	log.Printf("[INFO] Service Listener Port At 7201...")
+	err := http.ListenAndServe(":7201", mux)
 	if err != nil {
 		log.Fatalf("[FATAL] Start Server Error %s", err)
 	}
