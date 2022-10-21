@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"luxshare-mrsb/global"
-	"luxshare-mrsb/model"
+	"luxshare-daily-report/global"
+	"luxshare-daily-report/model"
 	"net/http"
 
 	"github.com/fsnotify/fsnotify"

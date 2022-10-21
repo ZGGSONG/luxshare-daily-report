@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"luxshare-mrsb/model"
+	"luxshare-daily-report/model"
 	"net/http"
 	"net/url"
 	"strings"

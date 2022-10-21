@@ -1,6 +1,6 @@
 package global
 
-import "luxshare-mrsb/config"
+import "luxshare-daily-report/config"
 
 var (
 	GLO_CONFIG    config.Config

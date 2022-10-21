@@ -1,4 +1,4 @@
-module luxshare-mrsb
+module luxshare-daily-report
 
 go 1.18
 

@@ -1,9 +1,9 @@
 package main
 
 import (
-	"luxshare-mrsb/config"
-	"luxshare-mrsb/global"
-	"luxshare-mrsb/serve"
+	"luxshare-daily-report/config"
+	"luxshare-daily-report/global"
+	"luxshare-daily-report/serve"
 	"net/http"
 	"os"
 

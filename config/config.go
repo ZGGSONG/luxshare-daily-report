@@ -35,7 +35,6 @@ type Config struct {
 	Quality  string
 	UserName string
 	PassWord string
-	UserInfo string
 	BarkUrl  string
 }
 
@@ -44,7 +43,6 @@ func getConfig() Config {
 	config.Quality = viper.GetString("img.quality")
 	config.UserName = viper.GetString("info.username")
 	config.PassWord = viper.GetString("info.password")
-	config.UserInfo = viper.GetString("info.userinfo")
 	config.BarkUrl = viper.GetString("message.bark.url")
 	return config
 }
