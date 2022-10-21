@@ -1,13 +1,14 @@
 package main
 
 import (
-	log "github.com/sirupsen/logrus"
-	"gopkg.in/natefinch/lumberjack.v2"
-	"ksat-mrsb/config"
-	"ksat-mrsb/global"
-	"ksat-mrsb/serve"
+	"luxshare-mrsb/config"
+	"luxshare-mrsb/global"
+	"luxshare-mrsb/serve"
 	"net/http"
 	"os"
+
+	log "github.com/sirupsen/logrus"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 func init() {

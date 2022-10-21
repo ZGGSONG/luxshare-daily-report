@@ -13,8 +13,8 @@ RUN cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 RUN echo "Asia/Shanghai" > /etc/timezone
 
 
-COPY ksat-mrsb "/app/ksat-mrsb"
+COPY luxshare-mrsb "/app/luxshare-mrsb"
 
 EXPOSE 7201
 
-ENTRYPOINT ["./ksat-mrsb"]
+ENTRYPOINT ["./luxshare-mrsb"]

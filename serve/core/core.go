@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"ksat-mrsb/model"
+	"luxshare-mrsb/model"
 	"net/http"
 	"net/url"
 	"strings"

@@ -1,6 +1,6 @@
 package global
 
-import "ksat-mrsb/config"
+import "luxshare-mrsb/config"
 
 var (
 	GLO_CONFIG    config.Config
