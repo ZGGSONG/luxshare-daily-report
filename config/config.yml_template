@@ -1,0 +1,8 @@
+img:
+  quality: 20
+info:
+  username: ""
+  password: ""
+message:
+  bark:
+    url: ""
