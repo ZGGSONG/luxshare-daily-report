@@ -56,7 +56,7 @@ func Login(userName, passwd string) (string, error) {
 //  @return []string
 //
 func Upload2Azure(auth string, images map[string]string) ([]string, error) {
-	var client = &http.Client{Timeout: 10}
+	var client = &http.Client{}
 	uploadUrl := "https://p.luxshare-ict.com/api/Azure/TencentFileToAzure"
 	contentType := "application/x-www-form-urlencoded"
 
@@ -75,11 +75,11 @@ func Upload2Azure(auth string, images map[string]string) ([]string, error) {
 	request.Header.Set("Authorization", fmt.Sprintf("BaseAuth %v", auth))
 
 	resp, err := client.Do(request)
-	//resp, err := http.Post(uploadUrl, contentType, strings.NewReader(postData.Encode()))
-	defer resp.Body.Close()
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("[ERROR] (Upload2Azure) Request Error: %v", err))
 	}
+	//resp, err := http.Post(uploadUrl, contentType, strings.NewReader(postData.Encode()))
+	defer resp.Body.Close()
 
 	body, _ := ioutil.ReadAll(resp.Body)
 	var uploadModel model.Upload2AzureResp
@@ -98,7 +98,7 @@ func Upload2Azure(auth string, images map[string]string) ([]string, error) {
 //  @return error
 //
 func EpidemicRegistration(auth string, images []string) error {
-	var client = &http.Client{Timeout: 10}
+	var client = &http.Client{}
 	uploadUrl := "https://m.luxshare-ict.com/api/EpidemicSys/EpidemicRegistration/LVIQuestSave2"
 	contentType := "application/x-www-form-urlencoded"
 
@@ -177,7 +177,7 @@ func EpidemicRegistration(auth string, images []string) error {
 //  @return error
 //
 func RefreshDoor(auth string) error {
-	var client = &http.Client{Timeout: 10}
+	var client = &http.Client{}
 	refreshUrl := "https://m.luxshare-ict.com/api/EpidemicSys/EpidemicRegistration/RefreshDoor"
 
 	request, err := http.NewRequest("POST", refreshUrl, nil)

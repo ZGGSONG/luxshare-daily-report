@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"image"
 	_ "image/gif"
 	"image/jpeg"
@@ -17,9 +18,6 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"time"
-
-	log "github.com/sirupsen/logrus"
 )
 
 //
@@ -93,7 +91,6 @@ https://github.com/zggsong`))
 //  @param files
 //
 func DeclarationService(files map[string]string) {
-	time.Sleep(3 * time.Second)
 	//登陆获取auth
 	//ticket := "Q9okHMY42Fk7kzLA3rvPTCbUShhX3zqlbaT97CDjUbxql0NH0AAqKYw+XfSjwoytijuuHXOc7vNY9GePZoIZSg=="
 	ticket, err := core.Login(global.GLO_CONFIG.UserName, global.GLO_CONFIG.PassWord)
