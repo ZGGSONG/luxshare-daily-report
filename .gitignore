@@ -12,3 +12,5 @@ luxshare-daily-report
 /upload
 
 *.yml
+
+.DS_Store
