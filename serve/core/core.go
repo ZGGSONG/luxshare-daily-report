@@ -56,7 +56,7 @@ func Login(userName, passwd string) (string, error) {
 //  @return []string
 //
 func Upload2Azure(auth string, images map[string]string) ([]string, error) {
-	var client = &http.Client{}
+	var client = &http.Client{Timeout: 10}
 	uploadUrl := "https://p.luxshare-ict.com/api/Azure/TencentFileToAzure"
 	contentType := "application/x-www-form-urlencoded"
 
@@ -98,7 +98,7 @@ func Upload2Azure(auth string, images map[string]string) ([]string, error) {
 //  @return error
 //
 func EpidemicRegistration(auth string, images []string) error {
-	var client = &http.Client{}
+	var client = &http.Client{Timeout: 10}
 	uploadUrl := "https://m.luxshare-ict.com/api/EpidemicSys/EpidemicRegistration/LVIQuestSave2"
 	contentType := "application/x-www-form-urlencoded"
 
@@ -177,7 +177,7 @@ func EpidemicRegistration(auth string, images []string) error {
 //  @return error
 //
 func RefreshDoor(auth string) error {
-	var client = &http.Client{}
+	var client = &http.Client{Timeout: 10}
 	refreshUrl := "https://m.luxshare-ict.com/api/EpidemicSys/EpidemicRegistration/RefreshDoor"
 
 	request, err := http.NewRequest("POST", refreshUrl, nil)

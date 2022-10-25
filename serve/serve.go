@@ -122,25 +122,35 @@ func DeclarationService(files map[string]string) {
 	}
 
 	//申报
-	if err = core.EpidemicRegistration(ticket, imagesLinks); err != nil {
-		log.Printf(err.Error())
-		util.Send(err.Error())
-		return
+	for i := 0; i < 3; i++ {
+		err = core.EpidemicRegistration(ticket, imagesLinks)
+		if err != nil && i > 1 {
+			log.Printf("重试3次失败，%v", err.Error())
+			util.Send(err.Error())
+			return
+		} else {
+			break
+		}
+
 	}
 	log.Printf("[INFO] 每日申报成功")
 
-	//等待
-	time.Sleep(time.Second * 3)
+	//time.Sleep(time.Second * 3)
 
 	//刷新门禁
-	if err = core.RefreshDoor(ticket); err != nil {
-		log.Printf(err.Error())
-		util.Send(err.Error())
-		return
+	for i := 0; i < 3; i++ {
+		err = core.RefreshDoor(ticket)
+		if err != nil && i > 1 {
+			log.Printf("重试3次失败，%v", err.Error())
+			util.Send(err.Error())
+			return
+		} else {
+			break
+		}
 	}
 	log.Printf("[INFO] 刷新门禁成功")
 
-	util.Send("[INFO] 每日申报成功")
+	util.Send("[INFO] 每日申报+刷新门禁成功")
 }
 
 //
