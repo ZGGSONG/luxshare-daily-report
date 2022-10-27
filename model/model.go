@@ -69,3 +69,14 @@ type BarkResp struct {
 	Message   string `json:"message"`
 	Timestamp int    `json:"timestamp"`
 }
+
+//
+// Config
+//  @Description: config model
+//
+type Config struct {
+	Quality  string
+	UserName string
+	PassWord string
+	BarkUrl  string
+}

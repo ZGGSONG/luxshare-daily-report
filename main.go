@@ -3,6 +3,7 @@ package main
 import (
 	"luxshare-daily-report/config"
 	"luxshare-daily-report/global"
+	"luxshare-daily-report/model"
 	"luxshare-daily-report/serve"
 	"net/http"
 	"os"
@@ -46,6 +47,7 @@ func main() {
 	// 监听目录下文件
 	//go util.ListeningDirectory("upload")
 	global.GLO_RECV_CHAN = make(chan map[string]string)
+	global.GLO_CONFIG_CHAN = make(chan model.Config)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", serve.HandlerRoot)
@@ -68,6 +70,8 @@ func main() {
 func chanHandler() {
 	for {
 		select {
+		case newConf := <-global.GLO_CONFIG_CHAN:
+			global.GLO_CONFIG = newConf
 		case result := <-global.GLO_RECV_CHAN:
 			for _, v := range result {
 				serve.CompressImageResource(v)
