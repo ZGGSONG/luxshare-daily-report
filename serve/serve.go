@@ -15,7 +15,7 @@ import (
 	"io/ioutil"
 	"luxshare-daily-report/global"
 	"luxshare-daily-report/serve/core"
-	"luxshare-daily-report/support"
+	"luxshare-daily-report/util"
 	"net/http"
 	"os"
 	"strconv"
@@ -97,7 +97,7 @@ func DeclarationService(files map[string]string) {
 	ticket, err := core.Login(global.GLO_CONFIG.UserName, global.GLO_CONFIG.PassWord)
 	if ticket == "" || err != nil {
 		log.Printf("ticket: %v, err:%v", ticket, err.Error())
-		support.SendMessageError(err)
+		util.SendMessageError(err)
 		return
 	}
 
@@ -114,13 +114,13 @@ func DeclarationService(files map[string]string) {
 	//log.Printf("[DEBUG] get images links: %s", imagesLinks)
 	if err != nil {
 		log.Printf(err.Error())
-		support.SendMessageError(err)
+		util.SendMessageError(err)
 		return
 	}
 	if imagesLinks == nil {
 		err = errors.New("[ERROR] Get no images links")
 		log.Printf(err.Error())
-		support.SendMessageError(err)
+		util.SendMessageError(err)
 		return
 	}
 
@@ -129,7 +129,7 @@ func DeclarationService(files map[string]string) {
 		err = core.EpidemicRegistration(ticket, imagesLinks)
 		if err != nil && i > 1 {
 			log.Printf("重试3次失败，%v", err.Error())
-			support.SendMessageError(err)
+			util.SendMessageError(err)
 			return
 		} else {
 			break
@@ -145,7 +145,7 @@ func DeclarationService(files map[string]string) {
 		err = core.RefreshDoor(ticket)
 		if err != nil && i > 1 {
 			log.Printf("重试3次失败，%v", err.Error())
-			support.SendMessageError(err)
+			util.SendMessageError(err)
 			return
 		} else {
 			break
@@ -153,7 +153,7 @@ func DeclarationService(files map[string]string) {
 	}
 	log.Printf("[INFO] 刷新门禁成功")
 
-	support.SendSuccess("【成功】每日申报、刷新门禁")
+	util.SendSuccess("【成功】每日申报、刷新门禁")
 }
 
 //
