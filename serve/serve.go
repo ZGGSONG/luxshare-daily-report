@@ -3,6 +3,7 @@ package serve
 import (
 	"bytes"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"image"
@@ -14,7 +15,7 @@ import (
 	"io/ioutil"
 	"luxshare-daily-report/global"
 	"luxshare-daily-report/serve/core"
-	"luxshare-daily-report/util"
+	"luxshare-daily-report/support"
 	"net/http"
 	"os"
 	"strconv"
@@ -82,7 +83,7 @@ https://github.com/zggsong`))
 		global.GLO_RECV_CHAN <- m
 	}
 
-	w.Write([]byte("Successful...")) //这个写入到w的是输出到客户端的
+	w.Write([]byte("服务端接收成功...")) //这个写入到w的是输出到客户端的
 }
 
 //
@@ -95,9 +96,8 @@ func DeclarationService(files map[string]string) {
 	//ticket := "Q9okHMY42Fk7kzLA3rvPTCbUShhX3zqlbaT97CDjUbxql0NH0AAqKYw+XfSjwoytijuuHXOc7vNY9GePZoIZSg=="
 	ticket, err := core.Login(global.GLO_CONFIG.UserName, global.GLO_CONFIG.PassWord)
 	if ticket == "" || err != nil {
-		errMsg := fmt.Sprintf("ticket: %v, err:%v", ticket, err.Error())
-		log.Printf(errMsg)
-		util.Send(errMsg)
+		log.Printf("ticket: %v, err:%v", ticket, err.Error())
+		support.SendMessageError(err)
 		return
 	}
 
@@ -111,10 +111,16 @@ func DeclarationService(files map[string]string) {
 	m["jkm"] = resJkm
 	//imagesLinks := []string{"https://p.luxshare-ict.com/KSLANTO/EpidemicSys/20221016/html5_2a05b9ab03844033a63b2c2ac06556ab.jpg", "https://p.luxshare-ict.com/KSLANTO/EpidemicSys/20221016/html5_7e64fd5c643c49299571583163623f7b.jpg"}
 	imagesLinks, err := core.Upload2Azure(ticket, m)
-	//log.Printf("[DEBUG] images links: %s", imagesLinks)
+	//log.Printf("[DEBUG] get images links: %s", imagesLinks)
 	if err != nil {
 		log.Printf(err.Error())
-		util.Send(err.Error())
+		support.SendMessageError(err)
+		return
+	}
+	if imagesLinks == nil {
+		err = errors.New("[ERROR] Get no images links")
+		log.Printf(err.Error())
+		support.SendMessageError(err)
 		return
 	}
 
@@ -123,7 +129,7 @@ func DeclarationService(files map[string]string) {
 		err = core.EpidemicRegistration(ticket, imagesLinks)
 		if err != nil && i > 1 {
 			log.Printf("重试3次失败，%v", err.Error())
-			util.Send(err.Error())
+			support.SendMessageError(err)
 			return
 		} else {
 			break
@@ -139,7 +145,7 @@ func DeclarationService(files map[string]string) {
 		err = core.RefreshDoor(ticket)
 		if err != nil && i > 1 {
 			log.Printf("重试3次失败，%v", err.Error())
-			util.Send(err.Error())
+			support.SendMessageError(err)
 			return
 		} else {
 			break
@@ -147,7 +153,7 @@ func DeclarationService(files map[string]string) {
 	}
 	log.Printf("[INFO] 刷新门禁成功")
 
-	util.Send("[INFO] 每日申报+刷新门禁成功")
+	support.SendSuccess("【成功】每日申报、刷新门禁")
 }
 
 //

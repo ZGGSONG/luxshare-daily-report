@@ -19,7 +19,7 @@ import (
 func InitialConfig() model.Config {
 	workPath, _ := os.Executable()
 	filePath := path.Dir(workPath)
-	filePath = filepath.Join(filePath, "/config/.yml")
+	filePath = filepath.Join(filePath, "/config/config.yml")
 	viper.SetConfigName("config")
 	viper.SetConfigType("yml")
 	viper.AddConfigPath("./config")
@@ -41,9 +41,19 @@ func InitialConfig() model.Config {
 
 func getConfig() model.Config {
 	var config model.Config
-	config.Quality = viper.GetString("img.quality")
-	config.UserName = viper.GetString("info.username")
-	config.PassWord = viper.GetString("info.password")
+	config.Quality = viper.GetString("images.quality")
+	config.UserName = viper.GetString("user.username")
+	config.PassWord = viper.GetString("user.password")
+	config.MsgEnabled = viper.GetBool("message.enabled")
+	config.MsgType = viper.GetString("message.type")
 	config.BarkUrl = viper.GetString("message.bark.url")
+	config.BarkKey = viper.GetString("message.bark.key")
+	config.MailHost = viper.GetString("message.mail.host")
+	config.MailProtocol = viper.GetString("message.mail.protocol")
+	config.MailPort = viper.GetInt("message.mail.port")
+	config.MailUser = viper.GetString("message.mail.username")
+	config.MailPwd = viper.GetString("message.mail.password")
+	config.MailFromName = viper.GetString("message.mail.from_name")
+	config.MailTo = viper.GetStringSlice("message.mail.to")
 	return config
 }

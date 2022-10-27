@@ -75,8 +75,18 @@ type BarkResp struct {
 //  @Description: config model
 //
 type Config struct {
-	Quality  string
-	UserName string
-	PassWord string
-	BarkUrl  string
+	Quality      string
+	UserName     string
+	PassWord     string
+	MsgEnabled   bool
+	MsgType      string
+	BarkUrl      string
+	BarkKey      string
+	MailHost     string
+	MailProtocol string
+	MailPort     int
+	MailUser     string
+	MailPwd      string
+	MailFromName string
+	MailTo       []string
 }
