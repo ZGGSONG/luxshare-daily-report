@@ -45,7 +45,6 @@ func init() {
 
 func main() {
 	// 监听目录下文件
-	//go util.ListeningDirectory("upload")
 	global.GLO_RECV_CHAN = make(chan map[string]string)
 	global.GLO_CONFIG_CHAN = make(chan model.Config)
 

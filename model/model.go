@@ -90,3 +90,22 @@ type Config struct {
 	MailFromName string
 	MailTo       []string
 }
+
+type HeaderUser struct {
+	CompanyOwner int    `json:"CompanyOwner"`
+	CompanyCode  string `json:"CompanyCode"`
+	CompanyName  string `json:"CompanyName"`
+	BUCode       string `json:"BUCode"`
+	BUName       string `json:"BUName"`
+	DeptCode     string `json:"DeptCode"`
+	DeptName     string `json:"DeptName"`
+	Code         string `json:"Code"`
+	Name         string `json:"Name"`
+	IDCardNo     string `json:"IDCardNo"`
+	Gender       string `json:"Gender"`
+	Telephone    string `json:"Telephone"`
+	Email        string `json:"Email"`
+	Language     string `json:"Language"`
+	LoginType    int    `json:"LoginType"`
+	DataSource   string `json:"DataSource"`
+}

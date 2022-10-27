@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"luxshare-daily-report/model"
+	"luxshare-daily-report/util"
 	"net/http"
 	"net/url"
 	"strings"
@@ -19,7 +20,7 @@ import (
 //  @param passwd
 //  @return string
 //
-func Login(userName, passwd string) (string, error) {
+func Login(userName, passwd string) (string, string, error) {
 	loginUrl := "https://m.luxshare-ict.com/api/Account/Login"
 	contentType := "application/x-www-form-urlencoded"
 
@@ -35,17 +36,55 @@ func Login(userName, passwd string) (string, error) {
 	resp, err := http.Post(loginUrl, contentType, strings.NewReader(postData.Encode()))
 	defer resp.Body.Close()
 	if err != nil {
-		return "", errors.New(fmt.Sprintf("[ERROR] (Login) Request Error: %v", err))
+		return "", "", errors.New(fmt.Sprintf("[ERROR] (Login) Request Error: %v", err))
 	}
 	body, _ := ioutil.ReadAll(resp.Body)
 	//fmt.Println(string(body))
 	var loginModel model.LoginResp
 	err = json.Unmarshal(body, &loginModel)
 	if err != nil {
-		return "", errors.New(fmt.Sprintf("[ERROR] (Login) Resp Json Unmarshal Error: %v", err))
+		return "", "", errors.New(fmt.Sprintf("[ERROR] (Login) Resp Json Unmarshal Error: %v", err))
+	}
+	//失败
+	if !loginModel.IsSuccess {
+		err = errors.New(util.Strval(loginModel.ErrMsg))
+		return "", "", err
 	}
 	ticket := loginModel.Data.Ticket
-	return ticket, nil
+
+	data, user := model.LoginRespData{}, model.UserInfo{}
+	if loginModel.Data == data || loginModel.Data.UserInfo == user {
+		err = errors.New(fmt.Sprintf("[ERROR] Login not return user information"))
+		return ticket, "", err
+	}
+	userStr := convert(loginModel.Data.UserInfo)
+
+	return ticket, userStr, nil
+}
+
+func convert(info model.UserInfo) string {
+	user := model.HeaderUser{
+		CompanyOwner: info.CompanyOwner,
+		CompanyCode:  info.CompanyCode,
+		CompanyName:  info.CompanyName,
+		BUCode:       info.BUCode,
+		BUName:       info.BUName,
+		DeptCode:     info.DeptCode,
+		DeptName:     info.DeptName,
+		Code:         info.Code,
+		Name:         info.Name,
+		IDCardNo:     info.IDCardNo,
+		Gender:       info.Gender,
+		Telephone:    info.Telephone,
+		Email:        info.Email,
+		Language:     "zh-cn",
+		LoginType:    info.LoginType,
+		DataSource:   "M",
+	}
+	bytes, _ := json.Marshal(user)
+	//url编码
+	escape := url.QueryEscape(string(bytes))
+	return escape
 }
 
 //
@@ -55,7 +94,7 @@ func Login(userName, passwd string) (string, error) {
 //  @param images
 //  @return []string
 //
-func Upload2Azure(auth string, images map[string]string) ([]string, error) {
+func Upload2Azure(auth, user string, images map[string]string) ([]string, error) {
 	var client = &http.Client{}
 	uploadUrl := "https://p.luxshare-ict.com/api/Azure/TencentFileToAzure"
 	contentType := "application/x-www-form-urlencoded"
@@ -71,7 +110,7 @@ func Upload2Azure(auth string, images map[string]string) ([]string, error) {
 		return nil, errors.New(fmt.Sprintf("[ERROR] (Upload2Azure) Error creating upload request: %v", err))
 	}
 	request.Header.Set("Content-Type", contentType)
-	request.Header.Set("__user__", `%7B%22CompanyOwner%22:888,%22CompanyCode%22:%22KSAT%22,%22CompanyName%22:%22%E6%B1%9F%E8%8B%8F%E6%9C%BA%E5%99%A8%E4%BA%BA%22,%22BUCode%22:%22U00001%22,%22BUName%22:%22%E6%99%BA%E8%83%BD%E5%88%B6%E9%80%A0%E5%BC%80%E5%8F%91%E4%B8%AD%E5%BF%83%22,%22DeptCode%22:%22U12544%22,%22DeptName%22:%22%E8%AE%BE%E5%A4%87%E4%BF%A1%E6%81%AF%E5%8C%96%E8%AF%BE%22,%22Code%22:%2213901424%22,%22Name%22:%22%E5%AE%8B%E5%A9%89%E5%86%9B%22,%22IDCardNo%22:%22340826199808161410%22,%22Gender%22:%22M%22,%22Telephone%22:%2217855513383%22,%22Email%22:%22Wanjun.Song@luxshare-ict.com%22,%22Language%22:%22zh-cn%22,%22LoginType%22:4,%22DataSource%22:%22M%22%7D`)
+	request.Header.Set("__user__", user)
 	request.Header.Set("Authorization", fmt.Sprintf("BaseAuth %v", auth))
 
 	resp, err := client.Do(request)
@@ -97,7 +136,7 @@ func Upload2Azure(auth string, images map[string]string) ([]string, error) {
 //  @param images
 //  @return error
 //
-func EpidemicRegistration(auth string, images []string) error {
+func EpidemicRegistration(auth, user string, images []string) error {
 	var client = &http.Client{}
 	uploadUrl := "https://m.luxshare-ict.com/api/EpidemicSys/EpidemicRegistration/LVIQuestSave2"
 	contentType := "application/x-www-form-urlencoded"
@@ -147,7 +186,7 @@ func EpidemicRegistration(auth string, images []string) error {
 		return errors.New(fmt.Sprintf("[ERROR] (EpidemicRegistration) Error creating upload request: %v", err))
 	}
 	request.Header.Set("Content-Type", contentType)
-	request.Header.Set("__user__", `%7B%22CompanyOwner%22:888,%22CompanyCode%22:%22KSAT%22,%22CompanyName%22:%22%E6%B1%9F%E8%8B%8F%E6%9C%BA%E5%99%A8%E4%BA%BA%22,%22BUCode%22:%22U00001%22,%22BUName%22:%22%E6%99%BA%E8%83%BD%E5%88%B6%E9%80%A0%E5%BC%80%E5%8F%91%E4%B8%AD%E5%BF%83%22,%22DeptCode%22:%22U12544%22,%22DeptName%22:%22%E8%AE%BE%E5%A4%87%E4%BF%A1%E6%81%AF%E5%8C%96%E8%AF%BE%22,%22Code%22:%2213901424%22,%22Name%22:%22%E5%AE%8B%E5%A9%89%E5%86%9B%22,%22IDCardNo%22:%22340826199808161410%22,%22Gender%22:%22M%22,%22Telephone%22:%2217855513383%22,%22Email%22:%22Wanjun.Song@luxshare-ict.com%22,%22Language%22:%22zh-cn%22,%22LoginType%22:4,%22DataSource%22:%22M%22%7D`)
+	request.Header.Set("__user__", user)
 	request.Header.Set("Authorization", fmt.Sprintf("BaseAuth %v", auth))
 
 	resp, err := client.Do(request)
@@ -176,7 +215,7 @@ func EpidemicRegistration(auth string, images []string) error {
 //  @param auth
 //  @return error
 //
-func RefreshDoor(auth string) error {
+func RefreshDoor(auth, user string) error {
 	var client = &http.Client{}
 	refreshUrl := "https://m.luxshare-ict.com/api/EpidemicSys/EpidemicRegistration/RefreshDoor"
 
@@ -184,7 +223,7 @@ func RefreshDoor(auth string) error {
 	if err != nil {
 		return errors.New(fmt.Sprintf("[ERROR] (RefreshDoor) Error creating upload request: %v", err))
 	}
-	request.Header.Set("__user__", `%7B%22CompanyOwner%22:888,%22CompanyCode%22:%22KSAT%22,%22CompanyName%22:%22%E6%B1%9F%E8%8B%8F%E6%9C%BA%E5%99%A8%E4%BA%BA%22,%22BUCode%22:%22U00001%22,%22BUName%22:%22%E6%99%BA%E8%83%BD%E5%88%B6%E9%80%A0%E5%BC%80%E5%8F%91%E4%B8%AD%E5%BF%83%22,%22DeptCode%22:%22U12544%22,%22DeptName%22:%22%E8%AE%BE%E5%A4%87%E4%BF%A1%E6%81%AF%E5%8C%96%E8%AF%BE%22,%22Code%22:%2213901424%22,%22Name%22:%22%E5%AE%8B%E5%A9%89%E5%86%9B%22,%22IDCardNo%22:%22340826199808161410%22,%22Gender%22:%22M%22,%22Telephone%22:%2217855513383%22,%22Email%22:%22Wanjun.Song@luxshare-ict.com%22,%22Language%22:%22zh-cn%22,%22LoginType%22:4,%22DataSource%22:%22M%22%7D`)
+	request.Header.Set("__user__", user)
 	request.Header.Set("Authorization", fmt.Sprintf("BaseAuth %v", auth))
 
 	resp, err := client.Do(request)
