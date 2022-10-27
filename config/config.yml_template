@@ -1,0 +1,19 @@
+images:
+  quality: 20   #图片压缩质量
+user:
+  username: ""  #用户名
+  password: ""  #密码
+message:
+  enabled: true #是否开启发送信息
+  type: "bark"  #选择发送信息方式
+  bark:
+    url: ""
+    key: ""
+  mail:
+    host: ""    #例:smtp.qq.com
+    protocol:   #Optional
+    port:       #例:587
+    username: ""
+    password: ""
+    from_name: "" #"zgg <zgg@mail.com>"
+    to: ""      #分号内空格分开
