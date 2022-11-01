@@ -100,7 +100,7 @@ func DeclarationService(files map[string]string) {
 		util.SendMessageError(err)
 		return
 	}
-	log.Printf("[DEBUG] __user__: %v", userStr)
+	//log.Printf("[DEBUG] __user__: %v", userStr)
 
 	//上传图片
 	var m = make(map[string]string, 2)
