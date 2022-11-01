@@ -93,14 +93,12 @@ https://github.com/zggsong`))
 //
 func DeclarationService(files map[string]string) {
 	//登陆获取auth
-	//ticket := "Q9okHMY42Fk7kzLA3rvPTCbUShhX3zqlbaT97CDjUbxql0NH0AAqKYw+XfSjwoytijuuHXOc7vNY9GePZoIZSg=="
 	ticket, userStr, err := core.Login(global.GLO_CONFIG.UserName, global.GLO_CONFIG.PassWord)
 	if ticket == "" || err != nil {
 		log.Printf("ticket: %v, err:%v", ticket, err.Error())
 		util.SendMessageError(err)
 		return
 	}
-	//log.Printf("[DEBUG] __user__: %v", userStr)
 
 	//上传图片
 	var m = make(map[string]string, 2)
@@ -110,7 +108,6 @@ func DeclarationService(files map[string]string) {
 	resJkm := base64.StdEncoding.EncodeToString(srcJkm)
 	m["xcm"] = resXcm
 	m["jkm"] = resJkm
-	//imagesLinks := []string{"https://p.luxshare-ict.com/KSLANTO/EpidemicSys/20221016/html5_2a05b9ab03844033a63b2c2ac06556ab.jpg", "https://p.luxshare-ict.com/KSLANTO/EpidemicSys/20221016/html5_7e64fd5c643c49299571583163623f7b.jpg"}
 	imagesLinks, err := core.Upload2Azure(ticket, userStr, m)
 	//log.Printf("[DEBUG] get images links: %s", imagesLinks)
 	if err != nil {
