@@ -13,6 +13,10 @@ import (
 )
 
 func init() {
+	// 监听目录下文件
+	global.GLO_RECV_CHAN = make(chan map[string]string)
+	global.GLO_CONFIG_CHAN = make(chan model.Config)
+
 	// 初始化日志
 	logger := &lumberjack.Logger{
 		//Filename:   "./Log/Receive_File_Log" + time.Now().Format("20060102_150405") + ".txt",
@@ -36,7 +40,7 @@ func init() {
 	if err != nil {
 		err = os.Mkdir("upload", 0755)
 		if err != nil {
-			log.Fatal("[ERROR] Could not create upload directory...")
+			log.Fatal("Could not create upload directory...")
 			return
 		}
 		log.Infof("Created Upload Directory")
@@ -44,10 +48,6 @@ func init() {
 }
 
 func main() {
-	// 监听目录下文件
-	global.GLO_RECV_CHAN = make(chan map[string]string)
-	global.GLO_CONFIG_CHAN = make(chan model.Config)
-
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", serve.HandlerRoot)
 	mux.HandleFunc("/upload", serve.HandlerSingleFile)

@@ -26,7 +26,7 @@ func InitialConfig() model.Config {
 	viper.AddConfigPath("../config")
 	viper.AddConfigPath(filePath)
 	viper.OnConfigChange(func(e fsnotify.Event) {
-		log.Tracef("配置文件更新: %v", e.Name)
+		log.Infof("配置文件更新: %v", e.Name)
 		global.GLO_CONFIG_CHAN <- getConfig()
 	})
 	viper.WatchConfig()
