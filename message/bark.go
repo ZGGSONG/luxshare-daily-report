@@ -23,7 +23,7 @@ func initBark() {
 }
 
 func (m Bark) Send(message Body) {
-	log.Println("[bark] Sending by bark...")
+	log.Infof("[bark] Sending by bark...")
 	var reqBody = Request{
 		DeviceKey: b.key,
 		Title:     message.Title,
@@ -37,7 +37,7 @@ func (m Bark) Send(message Body) {
 		log.Fatalf("[bark] http post failed: %v\n", err)
 	}
 	defer resp.Body.Close()
-	log.Printf("[bark] Send successful")
+	log.Infof("[bark] Send successful")
 }
 
 type Request struct {

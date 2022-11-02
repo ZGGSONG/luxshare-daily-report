@@ -27,7 +27,7 @@ func init() {
 	log.SetFormatter(&log.TextFormatter{
 		TimestampFormat: "2006-01-02 15:04:05",
 	})
-	log.Printf("[INFO] ======")
+	log.Infof("======")
 	// 初始化配置文件
 	global.GLO_CONFIG = config.InitialConfig()
 
@@ -39,7 +39,7 @@ func init() {
 			log.Fatal("[ERROR] Could not create upload directory...")
 			return
 		}
-		log.Printf("[INFO] Created Upload Directory")
+		log.Infof("Created Upload Directory")
 	}
 }
 
@@ -55,7 +55,7 @@ func main() {
 	// 监听每日申报
 	go chanHandler()
 
-	log.Printf("[INFO] Service Listener Port At 7201...")
+	log.Infof("Service Listener Port At 7201...")
 	err := http.ListenAndServe(":7201", mux)
 	if err != nil {
 		log.Fatalf("[FATAL] Start Server Error %s", err)

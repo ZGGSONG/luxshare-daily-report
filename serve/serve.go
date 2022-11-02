@@ -54,14 +54,14 @@ https://github.com/zggsong`))
 	// 根据字段名获取表单文件
 	formFile, _, err := r.FormFile("file")
 	if err != nil {
-		log.Printf("[ERROR] (HandlerSingleFile) Get form file failed: %s", err)
+		log.Errorf("(HandlerSingleFile) Get form file failed: %s", err)
 		return
 	}
 	defer formFile.Close()
 	// 创建保存文件
 	destFile, err := os.Create("./upload/" + fn)
 	if err != nil {
-		log.Printf("[ERROR] (HandlerSingleFile) Create Save failed: %s", err)
+		log.Errorf("(HandlerSingleFile) Create Save failed: %s", err)
 		return
 	}
 	defer destFile.Close()
@@ -69,10 +69,10 @@ https://github.com/zggsong`))
 	// 读取表单文件，写入保存文件
 	_, err = io.Copy(destFile, formFile)
 	if err != nil {
-		log.Printf("[ERROR] (HandlerSingleFile) Write file failed: %s", err)
+		log.Errorf("(HandlerSingleFile) Write file failed: %s", err)
 		return
 	}
-	log.Printf("[INFO] Have Receive File: %v", fn) //输出上传的文件名
+	log.Infof("Have Receive File: %v", fn) //输出上传的文件名
 	str, _ := os.Getwd()
 	dic := fmt.Sprintf("%v/upload/", str)
 	if fn == "xcm.jpeg" {
@@ -95,7 +95,7 @@ func DeclarationService(files map[string]string) {
 	//登陆获取auth
 	ticket, userStr, err := core.Login(global.GLO_CONFIG.UserName, global.GLO_CONFIG.PassWord)
 	if ticket == "" || err != nil {
-		log.Printf("ticket: %v, err:%v", ticket, err.Error())
+		log.Errorf("Ticket: %v, err:%v", ticket, err.Error())
 		util.SendMessageError(err)
 		return
 	}
@@ -111,13 +111,13 @@ func DeclarationService(files map[string]string) {
 	imagesLinks, err := core.Upload2Azure(ticket, userStr, m)
 	//log.Printf("[DEBUG] get images links: %s", imagesLinks)
 	if err != nil {
-		log.Printf(err.Error())
+		log.Errorf(err.Error())
 		util.SendMessageError(err)
 		return
 	}
 	if imagesLinks == nil {
 		err = errors.New("[ERROR] Get no images links")
-		log.Printf(err.Error())
+		log.Errorf(err.Error())
 		util.SendMessageError(err)
 		return
 	}
@@ -126,7 +126,7 @@ func DeclarationService(files map[string]string) {
 	for i := 0; i < 3; i++ {
 		err = core.EpidemicRegistration(ticket, userStr, imagesLinks)
 		if err != nil && i > 1 {
-			log.Printf("重试3次失败，%v", err.Error())
+			log.Errorf("重试3次失败，%v", err.Error())
 			util.SendMessageError(err)
 			return
 		} else {
@@ -134,20 +134,20 @@ func DeclarationService(files map[string]string) {
 		}
 
 	}
-	log.Printf("[INFO] 每日申报成功")
+	log.Infof("[INFO] 每日申报成功")
 
 	//刷新门禁
 	for i := 0; i < 3; i++ {
 		err = core.RefreshDoor(ticket, userStr)
 		if err != nil && i > 1 {
-			log.Printf("重试3次失败，%v", err.Error())
+			log.Errorf("重试3次失败，%v", err.Error())
 			util.SendMessageError(err)
 			return
 		} else {
 			break
 		}
 	}
-	log.Printf("[INFO] 刷新门禁成功")
+	log.Infof("[INFO] 刷新门禁成功")
 
 	util.SendSuccess("【成功】每日申报、刷新门禁")
 }
@@ -160,34 +160,34 @@ func DeclarationService(files map[string]string) {
 func CompressImageResource(imagePath string) {
 	file, err := os.Open(imagePath)
 	if err != nil {
-		log.Printf("[ERROR] (compressImageResource) Open File failed err: %v", err)
+		log.Errorf("(compressImageResource) Open File failed err: %v", err)
 	}
 	defer file.Close()
 
 	img, _, err := image.Decode(file)
 	if err != nil {
-		log.Printf("[ERROR] (compressImageResource) Decode error: %v", err)
+		log.Errorf("(compressImageResource) Decode error: %v", err)
 	}
 	buf := bytes.Buffer{}
 	quality, err := strconv.Atoi(global.GLO_CONFIG.Quality)
 	if err != nil {
-		log.Printf("[ERROR] (compressImageResource) Quality convert from config error: %v", err)
+		log.Errorf("(compressImageResource) Quality convert from config error: %v", err)
 	}
 	err = jpeg.Encode(&buf, img, &jpeg.Options{Quality: quality})
 	if err != nil {
-		log.Printf("[ERROR] (compressImageResource) Encode error: %v", err)
+		log.Errorf("(compressImageResource) Encode error: %v", err)
 	}
 	//保存到新文件中
 	newFile, err := os.Create(imagePath)
 	if err != nil {
-		log.Printf("[ERROR] (compressImageResource) Create Compress File failed err: %v", err)
+		log.Errorf("(compressImageResource) Create Compress File failed err: %v", err)
 	}
 	defer newFile.Close()
 	_, err = newFile.Write(buf.Bytes())
 	if err != nil {
-		log.Printf("[ERROR] (compressImageResource) Write Compress File failed err: %v", err)
+		log.Errorf("(compressImageResource) Write Compress File failed err: %v", err)
 	} else {
-		log.Printf("[INFO] Compress %v success", imagePath)
+		log.Infof("Compress %v success", imagePath)
 	}
 }
 
@@ -221,7 +221,7 @@ func HandlerMultiFiles(w http.ResponseWriter, r *http.Request) {
 			log.Fatal(err)
 		}
 		io.Copy(destFile, srcFile)
-		log.Printf("接收文件: %v", files[i].Filename) //输出上传的文件名
+		log.Infof("接收文件: %v", files[i].Filename) //输出上传的文件名
 	}
 	w.Write([]byte("successfully")) //这个写入到w的是输出到客户端的
 }

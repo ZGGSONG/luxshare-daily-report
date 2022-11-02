@@ -26,16 +26,16 @@ func InitialConfig() model.Config {
 	viper.AddConfigPath("../config")
 	viper.AddConfigPath(filePath)
 	viper.OnConfigChange(func(e fsnotify.Event) {
-		log.Printf("[INFO] 配置文件更新: %v", e.Name)
+		log.Tracef("配置文件更新: %v", e.Name)
 		global.GLO_CONFIG_CHAN <- getConfig()
 	})
 	viper.WatchConfig()
 	err := viper.ReadInConfig()
 	if err != nil {
-		log.Println("[ERROR] 未找到配置，请先添加配置")
+		log.Errorf("未找到配置，请先添加配置")
 		os.Exit(1)
 	}
-	log.Printf("[INFO] Loaded Config Success...")
+	log.Infof("Loaded Config Success...")
 	return getConfig()
 }
 

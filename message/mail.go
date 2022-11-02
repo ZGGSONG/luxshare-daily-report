@@ -33,7 +33,7 @@ func initMail() {
 }
 
 func (m Mail) Send(message Body) {
-	log.Println("[mail] Sending by mail...")
+	log.Infof("[mail] Sending by mail...")
 	e := email.NewEmail()
 	e.From = m.FromName
 	e.To = m.To
@@ -44,5 +44,5 @@ func (m Mail) Send(message Body) {
 	if err != nil {
 		log.Fatalf("[mail] Send failed: %v\n", err)
 	}
-	log.Printf("[mail] Send successful")
+	log.Infof("[mail] Send successful")
 }
