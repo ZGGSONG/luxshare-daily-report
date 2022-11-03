@@ -93,9 +93,9 @@ https://github.com/zggsong`))
 //
 func DeclarationService(files map[string]string) {
 	//登陆获取auth
-	ticket, userStr, err := core.Login(global.GLO_CONFIG.UserName, global.GLO_CONFIG.PassWord)
-	if ticket == "" || err != nil {
-		log.Errorf("Ticket: %v, err:%v", ticket, err.Error())
+	auth, __user__, err := core.Login(global.GLO_CONFIG.UserName, global.GLO_CONFIG.PassWord)
+	if auth == "" || err != nil {
+		log.Errorf("Ticket: %v, err:%v", auth, err.Error())
 		util.SendMessageError(err)
 		return
 	}
@@ -108,7 +108,7 @@ func DeclarationService(files map[string]string) {
 	resJkm := base64.StdEncoding.EncodeToString(srcJkm)
 	m["xcm"] = resXcm
 	m["jkm"] = resJkm
-	imagesLinks, err := core.Upload2Azure(ticket, userStr, m)
+	imagesLinks, err := core.Upload2Azure(auth, __user__, m)
 	//log.Printf("[DEBUG] get images links: %s", imagesLinks)
 	if err != nil {
 		log.Errorf(err.Error())
@@ -116,15 +116,21 @@ func DeclarationService(files map[string]string) {
 		return
 	}
 	if imagesLinks == nil {
-		err = errors.New("[ERROR] Get no images links")
+		err = errors.New("get no images links")
 		log.Errorf(err.Error())
 		util.SendMessageError(err)
 		return
 	}
 
+	//TODO: if model is nil
+	epidemicQuestLVIData, err := core.GetLVIQuestInitModel(auth, __user__)
+	if err != nil {
+		log.Errorf("获取个人初始化信息失败: %v", err.Error())
+	}
+
 	//申报
 	for i := 0; i < 3; i++ {
-		err = core.EpidemicRegistration(ticket, userStr, imagesLinks)
+		err = core.EpidemicRegistration(auth, __user__, imagesLinks, epidemicQuestLVIData)
 		if err != nil && i > 1 {
 			log.Errorf("重试3次失败，%v", err.Error())
 			util.SendMessageError(err)
@@ -134,11 +140,11 @@ func DeclarationService(files map[string]string) {
 		}
 
 	}
-	log.Infof("[INFO] 每日申报成功")
+	log.Infof("每日申报成功")
 
 	//刷新门禁
 	for i := 0; i < 3; i++ {
-		err = core.RefreshDoor(ticket, userStr)
+		err = core.RefreshDoor(auth, __user__)
 		if err != nil && i > 1 {
 			log.Errorf("重试3次失败，%v", err.Error())
 			util.SendMessageError(err)
@@ -147,7 +153,7 @@ func DeclarationService(files map[string]string) {
 			break
 		}
 	}
-	log.Infof("[INFO] 刷新门禁成功")
+	log.Infof("刷新门禁成功")
 
 	util.SendSuccess("【成功】每日申报、刷新门禁")
 }

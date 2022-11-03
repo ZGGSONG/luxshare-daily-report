@@ -10,6 +10,7 @@ import (
 	"luxshare-daily-report/util"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 )
 
@@ -36,14 +37,14 @@ func Login(userName, passwd string) (string, string, error) {
 	resp, err := http.Post(loginUrl, contentType, strings.NewReader(postData.Encode()))
 	defer resp.Body.Close()
 	if err != nil {
-		return "", "", errors.New(fmt.Sprintf("[ERROR] (Login) Request Error: %v", err))
+		return "", "", errors.New(fmt.Sprintf("(Login) Request Error: %v", err))
 	}
 	body, _ := ioutil.ReadAll(resp.Body)
 	//fmt.Println(string(body))
 	var loginModel model.LoginResp
 	err = json.Unmarshal(body, &loginModel)
 	if err != nil {
-		return "", "", errors.New(fmt.Sprintf("[ERROR] (Login) Resp Json Unmarshal Error: %v", err))
+		return "", "", errors.New(fmt.Sprintf("(Login) Resp Json Unmarshal Error: %v", err))
 	}
 	//失败
 	if !loginModel.IsSuccess {
@@ -54,7 +55,7 @@ func Login(userName, passwd string) (string, string, error) {
 
 	data, user := model.LoginRespData{}, model.UserInfo{}
 	if loginModel.Data == data || loginModel.Data.UserInfo == user {
-		err = errors.New(fmt.Sprintf("[ERROR] Login not return user information"))
+		err = errors.New(fmt.Sprintf("Login not return user information"))
 		return ticket, "", err
 	}
 	userStr := convert(loginModel.Data.UserInfo)
@@ -107,7 +108,7 @@ func Upload2Azure(auth, user string, images map[string]string) ([]string, error)
 
 	request, err := http.NewRequest("POST", uploadUrl, strings.NewReader(postData.Encode()))
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("[ERROR] (Upload2Azure) Error creating upload request: %v", err))
+		return nil, errors.New(fmt.Sprintf("(Upload2Azure) Error creating upload request: %v", err))
 	}
 	request.Header.Set("Content-Type", contentType)
 	request.Header.Set("__user__", user)
@@ -115,7 +116,7 @@ func Upload2Azure(auth, user string, images map[string]string) ([]string, error)
 
 	resp, err := client.Do(request)
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("[ERROR] (Upload2Azure) Request Error: %v", err))
+		return nil, errors.New(fmt.Sprintf("(Upload2Azure) Request Error: %v", err))
 	}
 	//resp, err := http.Post(uploadUrl, contentType, strings.NewReader(postData.Encode()))
 	defer resp.Body.Close()
@@ -124,9 +125,44 @@ func Upload2Azure(auth, user string, images map[string]string) ([]string, error)
 	var uploadModel model.Upload2AzureResp
 	err = json.Unmarshal(body, &uploadModel)
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("[ERROR] (Upload2Azure) Resp Json Unmarshal Error: %v", err))
+		return nil, errors.New(fmt.Sprintf("(Upload2Azure) Resp Json Unmarshal Error: %v", err))
 	}
 	return uploadModel.Data.ImagePaths, nil
+}
+
+//
+// GetLVIQuestInitModel
+//  @Description: 获取以往个人信息
+//  @param auth
+//  @param user
+//  @return model.LVIQuestInitModelData
+//  @return error
+//
+func GetLVIQuestInitModel(auth, user string) (model.EpidemicQuestLVI, error) {
+	var nilModel model.EpidemicQuestLVI
+	var client = &http.Client{}
+	url := "https://m.luxshare-ict.com/api/EpidemicSys/EpidemicRegistration/LVIQuestInit"
+
+	request, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nilModel, errors.New(fmt.Sprintf("(GetLVIQuestInitModel) Error creating request: %v", err))
+	}
+	request.Header.Set("__user__", user)
+	request.Header.Set("Authorization", fmt.Sprintf("BaseAuth %v", auth))
+
+	resp, err := client.Do(request)
+	if err != nil {
+		return nilModel, errors.New(fmt.Sprintf("(GetLVIQuestInitModel) Request Error: %v", err))
+	}
+	defer resp.Body.Close()
+
+	body, _ := ioutil.ReadAll(resp.Body)
+	var livModel model.LVIQuestInitModel
+	err = json.Unmarshal(body, &livModel)
+	if err != nil {
+		return nilModel, errors.New(fmt.Sprintf("(GetLVIQuestInitModel) Resp Json Unmarshal Error: %v", err))
+	}
+	return livModel.Data.EpidemicQuestLVI, nil
 }
 
 //
@@ -136,54 +172,54 @@ func Upload2Azure(auth, user string, images map[string]string) ([]string, error)
 //  @param images
 //  @return error
 //
-func EpidemicRegistration(auth, user string, images []string) error {
+func EpidemicRegistration(auth, user string, images []string, data model.EpidemicQuestLVI) error {
 	var client = &http.Client{}
 	uploadUrl := "https://m.luxshare-ict.com/api/EpidemicSys/EpidemicRegistration/LVIQuestSave2"
 	contentType := "application/x-www-form-urlencoded"
 
 	postData := url.Values{}
-	postData.Add("nowAddress", "鑫河湾")
-	postData.Add("street", "锦溪镇")
-	postData.Add("isRisk", "否")
-	postData.Add("isWork", "是")
-	postData.Add("isRoom", "否")
-	postData.Add("isRiskContact1", "否")
-	postData.Add("isRiskContact2", "否")
-	postData.Add("isDays14", "否")
-	postData.Add("isSymptom", "否")
-	postData.Add("isVaccination", "是")
-	postData.Add("vaccinationCount", "3")
+	postData.Add("nowAddress", data.NowAddress)
+	postData.Add("street", data.Street)
+	postData.Add("isRisk", data.IsRisk)
+	postData.Add("isWork", data.IsWork)
+	postData.Add("isRoom", data.IsRoom)
+	postData.Add("isRiskContact1", data.IsRiskContact1)
+	postData.Add("isRiskContact2", data.IsRiskContact2)
+	postData.Add("isDays14", data.IsDays14)
+	postData.Add("isSymptom", data.IsSymptom)
+	postData.Add("isVaccination", data.IsVaccination)
+	postData.Add("vaccinationCount", strconv.Itoa(data.VaccinationCount))
 	postData.Add("imagePaths[]", images[0])
 	postData.Add("imagePaths[]", images[1])
-	postData.Add("residCity", "江苏省+苏州市+昆山市")
-	postData.Add("vaccineDt", "2021/05/13")
-	postData.Add("vaccineDt2", "2021/06/11")
-	postData.Add("vaccineDt3", "2021/12/18")
-	postData.Add("noVaccineReason", "")
-	postData.Add("healthCodeColor", "绿色")
-	postData.Add("vaccinType", "三针型")
-	postData.Add("temperature", "")
-	postData.Add("isGtPerson", "")
-	postData.Add("gtAddress", "")
-	postData.Add("gtShenzhenTime", "")
-	postData.Add("gtDongguanTime", "")
-	postData.Add("dormArea", "")
-	postData.Add("dormBuilding", "")
-	postData.Add("dormRoom", "")
-	postData.Add("byCity", "江苏省苏州市")
-	postData.Add("latitude", "31.17725")
-	postData.Add("longitude", "120.9165")
-	postData.Add("registLocal", "江苏省苏州市昆山市学苑路")
-	postData.Add("isXinGuanHistory", "")
-	postData.Add("historyDate", "")
-	postData.Add("isForeigner", "")
-	postData.Add("isEntry", "")
-	postData.Add("entryDate", "")
-	postData.Add("isTravelToShangHai", "")
+	postData.Add("residCity", data.ResidCity)
+	postData.Add("vaccineDt", data.VaccineDt[:10])
+	postData.Add("vaccineDt2", data.VaccineDt2[:10])
+	postData.Add("vaccineDt3", data.VaccineDt3[:10])
+	postData.Add("noVaccineReason", data.NoVaccineReason)
+	postData.Add("healthCodeColor", data.HealthCodeColor)
+	postData.Add("vaccinType", data.VaccinType)
+	postData.Add("temperature", data.Temperature)
+	postData.Add("isGtPerson", data.IsGtPerson)
+	postData.Add("gtAddress", data.GtAddress)
+	postData.Add("gtShenzhenTime", data.GtShenzhenTime)
+	postData.Add("gtDongguanTime", data.GtDongguanTime)
+	postData.Add("dormArea", data.DormArea)
+	postData.Add("dormBuilding", data.DormBuilding)
+	postData.Add("dormRoom", data.DormRoom)
+	postData.Add("byCity", data.ByCity)
+	postData.Add("latitude", data.Latitude)
+	postData.Add("longitude", data.Longitude)
+	postData.Add("registLocal", data.RegistLocal)
+	postData.Add("isXinGuanHistory", data.IsXinGuanHistory)
+	postData.Add("historyDate", data.HistoryDate)
+	postData.Add("isForeigner", data.IsForeigner)
+	postData.Add("isEntry", data.IsEntry)
+	postData.Add("entryDate", data.EntryDate)
+	postData.Add("isTravelToShangHai", data.IsTravelToShangHai)
 
 	request, err := http.NewRequest("POST", uploadUrl, strings.NewReader(postData.Encode()))
 	if err != nil {
-		return errors.New(fmt.Sprintf("[ERROR] (EpidemicRegistration) Error creating upload request: %v", err))
+		return errors.New(fmt.Sprintf("(EpidemicRegistration) Error creating upload request: %v", err))
 	}
 	request.Header.Set("Content-Type", contentType)
 	request.Header.Set("__user__", user)
@@ -193,18 +229,18 @@ func EpidemicRegistration(auth, user string, images []string) error {
 
 	defer resp.Body.Close()
 	if err != nil {
-		return errors.New(fmt.Sprintf("[ERROR] (EpidemicRegistration) Request Error: %v", err))
+		return errors.New(fmt.Sprintf("(EpidemicRegistration) Request Error: %v", err))
 	}
 
 	body, _ := ioutil.ReadAll(resp.Body)
 	var epidemicRegistrationModel model.UniverseResp
 	err = json.Unmarshal(body, &epidemicRegistrationModel)
 	if err != nil {
-		return errors.New(fmt.Sprintf("[ERROR] (EpidemicRegistration) Resp Json Unmarshal Error: %v", err))
+		return errors.New(fmt.Sprintf("(EpidemicRegistration) Resp Json Unmarshal Error: %v", err))
 	}
 
 	if !epidemicRegistrationModel.IsSuccess {
-		return errors.New(fmt.Sprintf("[ERROR] (EpidemicRegistration) Resp ErrMsg: %v", epidemicRegistrationModel.ErrMsg))
+		return errors.New(fmt.Sprintf("(EpidemicRegistration) Resp ErrMsg: %v", epidemicRegistrationModel.ErrMsg))
 	}
 	return nil
 }
@@ -221,7 +257,7 @@ func RefreshDoor(auth, user string) error {
 
 	request, err := http.NewRequest("POST", refreshUrl, nil)
 	if err != nil {
-		return errors.New(fmt.Sprintf("[ERROR] (RefreshDoor) Error creating upload request: %v", err))
+		return errors.New(fmt.Sprintf("(RefreshDoor) Error creating upload request: %v", err))
 	}
 	request.Header.Set("__user__", user)
 	request.Header.Set("Authorization", fmt.Sprintf("BaseAuth %v", auth))
@@ -230,18 +266,18 @@ func RefreshDoor(auth, user string) error {
 
 	defer resp.Body.Close()
 	if err != nil {
-		return errors.New(fmt.Sprintf("[ERROR] (RefreshDoor) Request Error: %v", err))
+		return errors.New(fmt.Sprintf("(RefreshDoor) Request Error: %v", err))
 	}
 
 	body, _ := ioutil.ReadAll(resp.Body)
 	var refreshDoorResp model.UniverseResp
 	err = json.Unmarshal(body, &refreshDoorResp)
 	if err != nil {
-		return errors.New(fmt.Sprintf("[ERROR] (RefreshDoor) Resp Json Unmarshal Error: %v", err))
+		return errors.New(fmt.Sprintf("(RefreshDoor) Resp Json Unmarshal Error: %v", err))
 	}
 
 	if !refreshDoorResp.IsSuccess {
-		return errors.New(fmt.Sprintf("[ERROR] (RefreshDoor) Resp ErrMsg: %v", refreshDoorResp.ErrMsg))
+		return errors.New(fmt.Sprintf("(RefreshDoor) Resp ErrMsg: %v", refreshDoorResp.ErrMsg))
 	}
 	return nil
 }
