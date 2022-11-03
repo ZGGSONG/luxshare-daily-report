@@ -41,6 +41,7 @@ func InitialConfig() model.Config {
 
 func getConfig() model.Config {
 	var config model.Config
+	config.RefreshDoor = viper.GetBool("server.refresh_door")
 	config.Quality = viper.GetString("images.quality")
 	config.UserName = viper.GetString("user.username")
 	config.PassWord = viper.GetString("user.password")

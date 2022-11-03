@@ -141,7 +141,11 @@ func DeclarationService(files map[string]string) {
 
 	}
 	log.Infof("每日申报成功")
+	util.SendSuccess("【成功】每日申报")
 
+	if !global.GLO_CONFIG.RefreshDoor {
+		return
+	}
 	//刷新门禁
 	for i := 0; i < 3; i++ {
 		err = core.RefreshDoor(auth, __user__)
@@ -154,8 +158,7 @@ func DeclarationService(files map[string]string) {
 		}
 	}
 	log.Infof("刷新门禁成功")
-
-	util.SendSuccess("【成功】每日申报、刷新门禁")
+	util.SendSuccess("【成功】刷新门禁")
 }
 
 //

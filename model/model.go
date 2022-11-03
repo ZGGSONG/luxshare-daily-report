@@ -75,6 +75,7 @@ type BarkResp struct {
 //  @Description: config model
 //
 type Config struct {
+	RefreshDoor  bool
 	Quality      string
 	UserName     string
 	PassWord     string
