@@ -192,9 +192,20 @@ func EpidemicRegistration(auth, user string, images []string, data model.Epidemi
 	postData.Add("imagePaths[]", images[0])
 	postData.Add("imagePaths[]", images[1])
 	postData.Add("residCity", data.ResidCity)
-	postData.Add("vaccineDt", data.VaccineDt[:10])
-	postData.Add("vaccineDt2", data.VaccineDt2[:10])
-	postData.Add("vaccineDt3", data.VaccineDt3[:10])
+	// fix panic
+	vaccineDt, vaccineDt2, vaccineDt3 := "", "", ""
+	if len(data.VaccineDt) > 10 {
+		vaccineDt = data.VaccineDt[:10]
+	}
+	if len(data.VaccineDt2) > 10 {
+		vaccineDt2 = data.VaccineDt2[:10]
+	}
+	if len(data.VaccineDt3) > 10 {
+		vaccineDt3 = data.VaccineDt3[:10]
+	}
+	postData.Add("vaccineDt", vaccineDt)
+	postData.Add("vaccineDt2", vaccineDt2)
+	postData.Add("vaccineDt3", vaccineDt3)
 	postData.Add("noVaccineReason", data.NoVaccineReason)
 	postData.Add("healthCodeColor", data.HealthCodeColor)
 	postData.Add("vaccinType", data.VaccinType)
