@@ -1,1 +1,3 @@
-CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" .
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app_amd64 -ldflags="-s -w"
+
+CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o app_arm64 -ldflags="-s -w"

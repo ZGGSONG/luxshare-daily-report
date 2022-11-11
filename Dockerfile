@@ -1,5 +1,7 @@
 FROM alpine:latest
 
+ARG TARGETARCH
+
 RUN mkdir "/app"
 WORKDIR "/app"
 
@@ -13,8 +15,10 @@ RUN cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 RUN echo "Asia/Shanghai" > /etc/timezone
 
 
-COPY luxshare-daily-report "/app/luxshare-daily-report"
+COPY app* "/app/."
+
+RUN mv app_${TARGETARCH} app
 
 EXPOSE 7201
 
-ENTRYPOINT ["./luxshare-daily-report"]
+ENTRYPOINT ["./app"]
