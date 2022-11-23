@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"luxshare-daily-report/model"
 	"luxshare-daily-report/util"
 	"net/http"
@@ -14,13 +14,12 @@ import (
 	"strings"
 )
 
-//
 // Login
-//  @Description: 登陆网站
-//  @param userName
-//  @param passwd
-//  @return string
 //
+//	@Description: 登陆网站
+//	@param userName
+//	@param passwd
+//	@return string
 func Login(userName, passwd string) (string, string, error) {
 	loginUrl := "https://m.luxshare-ict.com/api/Account/Login"
 	contentType := "application/x-www-form-urlencoded"
@@ -39,7 +38,7 @@ func Login(userName, passwd string) (string, string, error) {
 	if err != nil {
 		return "", "", errors.New(fmt.Sprintf("(Login) Request Error: %v", err))
 	}
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 	//fmt.Println(string(body))
 	var loginModel model.LoginResp
 	err = json.Unmarshal(body, &loginModel)
@@ -88,13 +87,12 @@ func convert(info model.UserInfo) string {
 	return escape
 }
 
-//
 // Upload2Azure
-//  @Description: 上传图片到Azure服务器
-//  @param auth
-//  @param images
-//  @return []string
 //
+//	@Description: 上传图片到Azure服务器
+//	@param auth
+//	@param images
+//	@return []string
 func Upload2Azure(auth, user string, images map[string]string) ([]string, error) {
 	var client = &http.Client{}
 	uploadUrl := "https://p.luxshare-ict.com/api/Azure/TencentFileToAzure"
@@ -121,7 +119,7 @@ func Upload2Azure(auth, user string, images map[string]string) ([]string, error)
 	//resp, err := http.Post(uploadUrl, contentType, strings.NewReader(postData.Encode()))
 	defer resp.Body.Close()
 
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 	var uploadModel model.Upload2AzureResp
 	err = json.Unmarshal(body, &uploadModel)
 	if err != nil {
@@ -130,14 +128,13 @@ func Upload2Azure(auth, user string, images map[string]string) ([]string, error)
 	return uploadModel.Data.ImagePaths, nil
 }
 
-//
 // GetLVIQuestInitModel
-//  @Description: 获取以往个人信息
-//  @param auth
-//  @param user
-//  @return model.LVIQuestInitModelData
-//  @return error
 //
+//	@Description: 获取以往个人信息
+//	@param auth
+//	@param user
+//	@return model.LVIQuestInitModelData
+//	@return error
 func GetLVIQuestInitModel(auth, user string) (model.EpidemicQuestLVI, error) {
 	var nilModel model.EpidemicQuestLVI
 	var client = &http.Client{}
@@ -156,7 +153,7 @@ func GetLVIQuestInitModel(auth, user string) (model.EpidemicQuestLVI, error) {
 	}
 	defer resp.Body.Close()
 
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 	var livModel model.LVIQuestInitModel
 	err = json.Unmarshal(body, &livModel)
 	if err != nil {
@@ -165,13 +162,12 @@ func GetLVIQuestInitModel(auth, user string) (model.EpidemicQuestLVI, error) {
 	return livModel.Data.EpidemicQuestLVI, nil
 }
 
-//
 // EpidemicRegistration
-//  @Description: 申报
-//  @param auth
-//  @param images
-//  @return error
 //
+//	@Description: 申报
+//	@param auth
+//	@param images
+//	@return error
 func EpidemicRegistration(auth, user string, images []string, data model.EpidemicQuestLVI) error {
 	var client = &http.Client{}
 	uploadUrl := "https://m.luxshare-ict.com/api/EpidemicSys/EpidemicRegistration/LVIQuestSave2"
@@ -243,7 +239,7 @@ func EpidemicRegistration(auth, user string, images []string, data model.Epidemi
 		return errors.New(fmt.Sprintf("(EpidemicRegistration) Request Error: %v", err))
 	}
 
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 	var epidemicRegistrationModel model.UniverseResp
 	err = json.Unmarshal(body, &epidemicRegistrationModel)
 	if err != nil {
@@ -256,12 +252,11 @@ func EpidemicRegistration(auth, user string, images []string, data model.Epidemi
 	return nil
 }
 
-//
 // RefreshDoor
-//  @Description: 刷新门禁
-//  @param auth
-//  @return error
 //
+//	@Description: 刷新门禁
+//	@param auth
+//	@return error
 func RefreshDoor(auth, user string) error {
 	var client = &http.Client{}
 	refreshUrl := "https://m.luxshare-ict.com/api/EpidemicSys/EpidemicRegistration/RefreshDoor"
@@ -280,7 +275,7 @@ func RefreshDoor(auth, user string) error {
 		return errors.New(fmt.Sprintf("(RefreshDoor) Request Error: %v", err))
 	}
 
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 	var refreshDoorResp model.UniverseResp
 	err = json.Unmarshal(body, &refreshDoorResp)
 	if err != nil {

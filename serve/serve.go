@@ -12,7 +12,6 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 	"io"
-	"io/ioutil"
 	"luxshare-daily-report/global"
 	"luxshare-daily-report/serve/core"
 	"luxshare-daily-report/util"
@@ -21,12 +20,11 @@ import (
 	"strconv"
 )
 
-//
 // HandlerRoot
-//  @Description: 根GET访问处理
-//  @param w
-//  @param r
 //
+//	@Description: 根GET访问处理
+//	@param w
+//	@param r
 func HandlerRoot(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(`Receive File Api
 
@@ -35,12 +33,11 @@ Just personal api for company daily reports...
 https://github.com/zggsong`))
 }
 
-//
 // HandlerSingleFile
-//  @Description: 单文件上传处理
-//  @param w
-//  @param r
 //
+//	@Description: 单文件上传处理
+//	@param w
+//	@param r
 func HandlerSingleFile(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		w.Write([]byte(`Receive File Api
@@ -86,24 +83,31 @@ https://github.com/zggsong`))
 	w.Write([]byte("服务端接收成功...")) //这个写入到w的是输出到客户端的
 }
 
-//
 // DeclarationService
-//  @Description: 每日申报服务
-//  @param files
 //
+//	@Description: 每日申报服务
+//	@param files
 func DeclarationService(files map[string]string) {
 	//登陆获取auth
 	auth, __user__, err := core.Login(global.GLO_CONFIG.UserName, global.GLO_CONFIG.PassWord)
-	if auth == "" || err != nil {
-		log.Errorf("Ticket: %v, err:%v", auth, err.Error())
-		util.SendMessageError(err)
+	if auth == "" || __user__ == "" || err != nil {
+		log.Errorf("Login fail, ticket: %v, __user__: %v, err:%v", auth, __user__, err.Error())
+		util.SendMessageError(errors.New(fmt.Sprintf("Get token or userinfo fail, %v", err)))
 		return
 	}
 
 	//上传图片
 	var m = make(map[string]string, 2)
-	srcXcm, _ := ioutil.ReadFile(files["xcm"])
-	srcJkm, _ := ioutil.ReadFile(files["jkm"])
+	srcXcm, err := os.ReadFile(files["xcm"])
+	if err != nil {
+		util.SendMessageError(errors.New(fmt.Sprintf("Read xcm file err, %v", err)))
+		return
+	}
+	srcJkm, err := os.ReadFile(files["jkm"])
+	if err != nil {
+		util.SendMessageError(errors.New(fmt.Sprintf("Read jkm file err, %v", err)))
+		return
+	}
 	resXcm := base64.StdEncoding.EncodeToString(srcXcm)
 	resJkm := base64.StdEncoding.EncodeToString(srcJkm)
 	m["xcm"] = resXcm
@@ -112,20 +116,21 @@ func DeclarationService(files map[string]string) {
 	//log.Printf("[DEBUG] get images links: %s", imagesLinks)
 	if err != nil {
 		log.Errorf(err.Error())
-		util.SendMessageError(err)
+		util.SendMessageError(errors.New(fmt.Sprintf("Upload images err, %v", err)))
 		return
 	}
 	if imagesLinks == nil {
-		err = errors.New("get no images links")
+		err = errors.New("get a link to the images")
 		log.Errorf(err.Error())
 		util.SendMessageError(err)
 		return
 	}
 
-	//TODO: if model is nil
 	epidemicQuestLVIData, err := core.GetLVIQuestInitModel(auth, __user__)
 	if err != nil {
-		log.Errorf("获取个人初始化信息失败: %v", err.Error())
+		log.Errorf("Failed to obtain personal initialization information: %v", err.Error())
+		util.SendMessageError(errors.New(fmt.Sprintf("Get user info fail, %v", err)))
+		return
 	}
 
 	//申报
@@ -161,11 +166,10 @@ func DeclarationService(files map[string]string) {
 	util.SendSuccess("【成功】刷新门禁")
 }
 
-//
 // CompressImageResource
-//  @Description: 压缩JPEG文件
-//  @param imagePath
 //
+//	@Description: 压缩JPEG文件
+//	@param imagePath
 func CompressImageResource(imagePath string) {
 	file, err := os.Open(imagePath)
 	if err != nil {
@@ -200,12 +204,11 @@ func CompressImageResource(imagePath string) {
 	}
 }
 
-//
 // HandlerMultiFiles
-//  @Description: 多文件上传处理
-//  @param w
-//  @param r
 //
+//	@Description: 多文件上传处理
+//	@param w
+//	@param r
 func HandlerMultiFiles(w http.ResponseWriter, r *http.Request) {
 	//设置内存大小
 	r.ParseMultipartForm(32 << 20)
