@@ -205,7 +205,7 @@ func EpidemicRegistration(auth, user string, images []string, data model.Epidemi
 	postData.Add("noVaccineReason", data.NoVaccineReason)
 	postData.Add("healthCodeColor", data.HealthCodeColor)
 	postData.Add("vaccinType", data.VaccinType)
-	postData.Add("temperature", data.Temperature)
+	postData.Add("temperature", strconv.FormatFloat(data.Temperature, 'f', 1, 64))
 	postData.Add("isGtPerson", data.IsGtPerson)
 	postData.Add("gtAddress", data.GtAddress)
 	postData.Add("gtShenzhenTime", data.GtShenzhenTime)
