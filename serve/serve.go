@@ -80,7 +80,7 @@ https://github.com/zggsong`))
 		global.GLO_RECV_CHAN <- m
 	}
 
-	w.Write([]byte("服务端接收成功...")) //这个写入到w的是输出到客户端的
+	w.Write([]byte("success")) //这个写入到w的是输出到客户端的
 }
 
 // DeclarationService
@@ -120,7 +120,7 @@ func DeclarationService(files map[string]string) {
 		return
 	}
 	if imagesLinks == nil {
-		err = errors.New("get a link to the images")
+		err = errors.New(fmt.Sprintf("Get a link to the images"))
 		log.Errorf(err.Error())
 		util.SendMessageError(err)
 		return
