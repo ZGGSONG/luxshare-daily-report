@@ -100,7 +100,7 @@ func Upload2Azure(auth, user string, images map[string]string) ([]string, error)
 
 	postData := url.Values{}
 	postData.Add("dir", "~/Upload2/EpidemicSys/")
-	postData.Add("mediaIds[]", fmt.Sprintf("data:image/jpg;base64,%v", images["xcm"]))
+	//postData.Add("mediaIds[]", fmt.Sprintf("data:image/jpg;base64,%v", images["xcm"]))
 	postData.Add("mediaIds[]", fmt.Sprintf("data:image/jpg;base64,%v", images["jkm"]))
 	postData.Add("source", "qyweixin")
 
@@ -176,17 +176,17 @@ func EpidemicRegistration(auth, user string, images []string, data model.Epidemi
 	postData := url.Values{}
 	postData.Add("nowAddress", data.NowAddress)
 	postData.Add("street", data.Street)
-	postData.Add("isRisk", data.IsRisk)
+	//postData.Add("isRisk", data.IsRisk)
 	postData.Add("isWork", data.IsWork)
 	postData.Add("isRoom", data.IsRoom)
-	postData.Add("isRiskContact1", data.IsRiskContact1)
-	postData.Add("isRiskContact2", data.IsRiskContact2)
+	//postData.Add("isRiskContact1", data.IsRiskContact1)
+	//postData.Add("isRiskContact2", data.IsRiskContact2)
 	postData.Add("isDays14", data.IsDays14)
 	postData.Add("isSymptom", data.IsSymptom)
 	postData.Add("isVaccination", data.IsVaccination)
 	postData.Add("vaccinationCount", strconv.Itoa(data.VaccinationCount))
 	postData.Add("imagePaths[]", images[0])
-	postData.Add("imagePaths[]", images[1])
+	//postData.Add("imagePaths[]", images[1])
 	postData.Add("residCity", data.ResidCity)
 	// fix panic
 	vaccineDt, vaccineDt2, vaccineDt3 := "", "", ""
@@ -223,6 +223,8 @@ func EpidemicRegistration(auth, user string, images []string, data model.Epidemi
 	postData.Add("isEntry", data.IsEntry)
 	postData.Add("entryDate", data.EntryDate)
 	postData.Add("isTravelToShangHai", data.IsTravelToShangHai)
+	postData.Add("currentWorkCompanyCode", data.CurrentWorkCompanyCode)
+	postData.Add("currentWorkCompanyName", data.CurrentWorkCompanyName)
 
 	request, err := http.NewRequest("POST", uploadUrl, strings.NewReader(postData.Encode()))
 	if err != nil {

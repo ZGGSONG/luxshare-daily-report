@@ -40,7 +40,7 @@ func init() {
 	if err != nil {
 		err = os.Mkdir("upload", 0755)
 		if err != nil {
-			log.Fatal("Could not create upload directory...")
+			log.Error("Could not create upload directory...")
 			return
 		}
 		log.Infof("Created Upload Directory")
@@ -58,7 +58,8 @@ func main() {
 	log.Infof("Service Listener Port At 7201...")
 	err := http.ListenAndServe(":7201", mux)
 	if err != nil {
-		log.Fatalf("[FATAL] Start Server Error %s", err)
+		log.Errorf("[FATAL] Start Server Error %s", err)
+		return
 	}
 }
 

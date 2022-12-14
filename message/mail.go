@@ -42,7 +42,8 @@ func (m Mail) Send(message Body) {
 	addr := fmt.Sprintf("%v:%v", m.Host, m.Port)
 	err := e.Send(addr, smtp.PlainAuth("", m.Username, m.Password, m.Host))
 	if err != nil {
-		log.Fatalf("[mail] Send failed: %v\n", err)
+		log.Errorf("[mail] Send failed: %v\n", err)
+		return
 	}
 	log.Infof("[mail] Send successful")
 }

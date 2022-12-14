@@ -34,7 +34,8 @@ func (m Bark) Send(message Body) {
 	req, _ := json.Marshal(reqBody)
 	resp, err := http.Post(m.url, "application/json; charset=utf-8", bytes.NewReader(req))
 	if err != nil {
-		log.Fatalf("[bark] http post failed: %v\n", err)
+		log.Errorf("[bark] http post failed: %v\n", err)
+		return
 	}
 	defer resp.Body.Close()
 	log.Infof("[bark] Send successful")

@@ -1,8 +1,8 @@
 package model
 
 // LoginResp
-//  @Description: 登陆返回Model
 //
+//	@Description: 登陆返回Model
 type LoginResp struct {
 	IsSuccess bool          `json:"IsSuccess"`
 	ErrMsg    interface{}   `json:"ErrMsg"`
@@ -39,10 +39,9 @@ type UserInfo struct {
 	IsOnJob      bool   `json:"IsOnJob"`
 }
 
-//
 // Upload2AzureResp
-//  @Description: 上传图片返回Model
 //
+//	@Description: 上传图片返回Model
 type Upload2AzureResp struct {
 	IsSuccess bool                 `json:"IsSuccess"`
 	ErrMsg    interface{}          `json:"ErrMsg"`
@@ -54,10 +53,9 @@ type Upload2AzureRespData struct {
 	IsOk       bool     `json:"IsOk"`
 }
 
-//
 // UniverseResp
-//  @Description: 申报、刷新门禁返回Model
 //
+//	@Description: 申报、刷新门禁返回Model
 type UniverseResp struct {
 	IsSuccess bool        `json:"IsSuccess"`
 	ErrMsg    string      `json:"ErrMsg"`
@@ -70,10 +68,9 @@ type BarkResp struct {
 	Timestamp int    `json:"timestamp"`
 }
 
-//
 // Config
-//  @Description: config model
 //
+//	@Description: config model
 type Config struct {
 	RefreshDoor  bool
 	Quality      string
@@ -92,10 +89,9 @@ type Config struct {
 	MailTo       []string
 }
 
-//
 // HeaderUser
-//  @Description: Header User Model
 //
+//	@Description: Header User Model
 type HeaderUser struct {
 	CompanyOwner int    `json:"CompanyOwner"`
 	CompanyCode  string `json:"CompanyCode"`
@@ -115,10 +111,9 @@ type HeaderUser struct {
 	DataSource   string `json:"DataSource"`
 }
 
-//
 // LVIQuestInitModel
-//  @Description: 获取以前填写过的信息
 //
+//	@Description: 获取以前填写过的信息
 type LVIQuestInitModel struct {
 	IsSuccess bool                  `json:"IsSuccess"`
 	ErrMsg    string                `json:"ErrMsg"`
@@ -232,4 +227,9 @@ type EpidemicQuestLVI struct {
 	OnJobDate            string `json:"OnJobDate"`
 	IsCheckHSOk          bool   `json:"IsCheckHSOk"`
 	FengXianDiId         string `json:"FengXianDiId"`
+
+	CurrentWorkCompanyCode string `json:"CurrentWorkCompanyCode"`
+	CurrentWorkCompanyName string `json:"CurrentWorkCompanyName"`
+	AdressArea             string `json:"AdressArea"`
+	AdressBuildNo          string `json:"AdressBuildNo"`
 }

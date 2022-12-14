@@ -72,10 +72,10 @@ https://github.com/zggsong`))
 	log.Infof("Have Receive File: %v", fn) //输出上传的文件名
 	str, _ := os.Getwd()
 	dic := fmt.Sprintf("%v/upload/", str)
-	if fn == "xcm.jpeg" {
+	if fn == "jkm.jpeg" {
 		//路径字典
 		m := make(map[string]string, 2)
-		m["xcm"] = dic + "xcm.jpeg"
+		//m["xcm"] = dic + "xcm.jpeg"
 		m["jkm"] = dic + "jkm.jpeg"
 		global.GLO_RECV_CHAN <- m
 	}
@@ -91,26 +91,26 @@ func DeclarationService(files map[string]string) {
 	//登陆获取auth
 	auth, __user__, err := core.Login(global.GLO_CONFIG.UserName, global.GLO_CONFIG.PassWord)
 	if auth == "" || __user__ == "" || err != nil {
-		log.Errorf("Login fail, ticket: %v, __user__: %v, err:%v", auth, __user__, err.Error())
+		log.Errorf("Login fail, err:%v", err.Error())
 		util.SendMessageError(errors.New(fmt.Sprintf("Get token or userinfo fail, %v", err)))
 		return
 	}
 
 	//上传图片
-	var m = make(map[string]string, 2)
-	srcXcm, err := os.ReadFile(files["xcm"])
-	if err != nil {
-		util.SendMessageError(errors.New(fmt.Sprintf("Read xcm file err, %v", err)))
-		return
-	}
+	var m = make(map[string]string, 1)
+	//srcXcm, err := os.ReadFile(files["xcm"])
+	//if err != nil {
+	//	util.SendMessageError(errors.New(fmt.Sprintf("Read xcm file err, %v", err)))
+	//	return
+	//}
 	srcJkm, err := os.ReadFile(files["jkm"])
 	if err != nil {
 		util.SendMessageError(errors.New(fmt.Sprintf("Read jkm file err, %v", err)))
 		return
 	}
-	resXcm := base64.StdEncoding.EncodeToString(srcXcm)
+	//resXcm := base64.StdEncoding.EncodeToString(srcXcm)
 	resJkm := base64.StdEncoding.EncodeToString(srcJkm)
-	m["xcm"] = resXcm
+	//m["xcm"] = resXcm
 	m["jkm"] = resJkm
 	imagesLinks, err := core.Upload2Azure(auth, __user__, m)
 	//log.Printf("[DEBUG] get images links: %s", imagesLinks)
@@ -221,7 +221,8 @@ func HandlerMultiFiles(w http.ResponseWriter, r *http.Request) {
 		defer srcFile.Close()
 
 		if err != nil {
-			log.Fatal(err)
+			log.Error(err)
+			return
 		}
 		//创建上传目录
 		os.Mkdir("./upload", os.ModePerm)
@@ -230,7 +231,8 @@ func HandlerMultiFiles(w http.ResponseWriter, r *http.Request) {
 
 		defer destFile.Close()
 		if err != nil {
-			log.Fatal(err)
+			log.Error(err)
+			return
 		}
 		io.Copy(destFile, srcFile)
 		log.Infof("接收文件: %v", files[i].Filename) //输出上传的文件名
